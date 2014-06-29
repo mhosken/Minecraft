@@ -44,7 +44,8 @@ def cube_vertices(x, y, z, n):
     ]
 
 
-def tex_coord(x, y, n=4):
+#def tex_coord(x, y, n=4):
+def tex_coord(x, y, n=16):
     """ Return the bounding vertices of the texture square.
 
     """
@@ -68,12 +69,14 @@ def tex_coords(top, bottom, side):
     return result
 
 
-TEXTURE_PATH = 'texture.png'
+#TEXTURE_PATH = 'texture.png'
+TEXTURE_PATH = 'grassy.png'
 
-GRASS = tex_coords((1, 0), (0, 1), (0, 0))
-SAND = tex_coords((1, 1), (1, 1), (1, 1))
-BRICK = tex_coords((2, 0), (2, 0), (2, 0))
-STONE = tex_coords((2, 1), (2, 1), (2, 1))
+GRASS = tex_coords((0, 15), (2, 15), (3, 15))
+SAND = tex_coords((2, 14), (2, 14), (2, 14))
+BRICK = tex_coords((7, 15), (7, 15), (7, 15))
+BEDROCK = tex_coords((1, 14), (1, 14), (1, 14))
+STONE = tex_coords((1,15), (1,15), (1,15))
 
 FACES = [
     ( 0, 1, 0),
@@ -160,11 +163,11 @@ class Model(object):
             for z in xrange(-n, n + 1, s):
                 # create a layer stone an grass everywhere.
                 self.add_block((x, y - 2, z), GRASS, immediate=False)
-                self.add_block((x, y - 3, z), STONE, immediate=False)
+                self.add_block((x, y - 3, z), BEDROCK, immediate=False)
                 if x in (-n, n) or z in (-n, n):
                     # create outer walls.
                     for dy in xrange(-2, 3):
-                        self.add_block((x, y + dy, z), STONE, immediate=False)
+                        self.add_block((x, y + dy, z), BEDROCK, immediate=False)
 
         # generate the hills randomly
         o = n - 10
@@ -175,7 +178,7 @@ class Model(object):
             h = random.randint(1, 6)  # height of the hill
             s = random.randint(4, 8)  # 2 * s is the side length of the hill
             d = 1  # how quickly to taper off the hills
-            t = random.choice([GRASS, SAND, BRICK])
+            t = random.choice([GRASS, SAND, BRICK, STONE])
             for y in xrange(c, c + h):
                 for x in xrange(a - s, a + s + 1):
                     for z in xrange(b - s, b + s + 1):
@@ -466,7 +469,7 @@ class Window(pyglet.window.Window):
         self.dy = 0
 
         # A list of blocks the player can place. Hit num keys to cycle.
-        self.inventory = [BRICK, GRASS, SAND]
+        self.inventory = [BRICK, GRASS, SAND, STONE]
 
         # The current block the user can place. Hit num keys to cycle.
         self.block = self.inventory[0]
@@ -676,7 +679,7 @@ class Window(pyglet.window.Window):
                     self.model.add_block(previous, self.block)
             elif button == pyglet.window.mouse.LEFT and block:
                 texture = self.model.world[block]
-                if texture != STONE:
+                if texture != BEDROCK:
                     self.model.remove_block(block)
         else:
             self.set_exclusive_mouse(True)
